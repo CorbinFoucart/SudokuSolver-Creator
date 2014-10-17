@@ -7,52 +7,112 @@ import java.util.*;
  * CS108 Stanford.
  */
 public class Sudoku {
-	// Provided grid data for main/testing
-	// The instance variable strategy is up to you.
+
+	private int[][] grid; 
 	
-	// Provided easy 1 6 grid
-	// (can paste this text into the GUI too)
-	public static final int[][] easyGrid = Sudoku.stringsToGrid(
-	"1 6 4 0 0 0 0 0 2",
-	"2 0 0 4 0 3 9 1 0",
-	"0 0 5 0 8 0 4 0 7",
-	"0 9 0 0 0 6 5 0 0",
-	"5 0 0 1 0 2 0 0 8",
-	"0 0 8 9 0 0 0 3 0",
-	"8 0 9 0 4 0 2 0 0",
-	"0 7 3 5 0 9 0 0 1",
-	"4 0 0 0 0 0 6 7 9");
-	
-	
-	// Provided medium 5 3 grid
-	public static final int[][] mediumGrid = Sudoku.stringsToGrid(
-	 "530070000",
-	 "600195000",
-	 "098000060",
-	 "800060003",
-	 "400803001",
-	 "700020006",
-	 "060000280",
-	 "000419005",
-	 "000080079");
-	
-	// Provided hard 3 7 grid
-	// 1 solution this way, 6 solutions if the 7 is changed to 0
-	public static final int[][] hardGrid = Sudoku.stringsToGrid(
-	"3 7 0 0 0 0 0 8 0",
-	"0 0 1 0 9 3 0 0 0",
-	"0 4 0 7 8 0 0 0 3",
-	"0 9 3 8 0 0 0 1 2",
-	"0 0 0 0 4 0 0 0 0",
-	"5 2 0 0 0 6 7 9 0",
-	"6 0 0 0 2 1 0 4 0",
-	"0 0 0 5 3 0 9 0 0",
-	"0 3 0 0 0 0 0 5 1");
+	// Provided Mmin
+	public static void main(String[] args) {
+		Sudoku sudoku;
+		sudoku = new Sudoku(hardGrid);
+		
+		System.out.println(sudoku); // print the raw problem
+//		int count = sudoku.solve();
+//		System.out.println("solutions:" + count);
+//		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
+//		System.out.println(sudoku.getSolutionText());
+	}
 	
 	
-	public static final int SIZE = 9;  // size of the whole 9x9 puzzle
-	public static final int PART = 3;  // size of each 3x3 part
-	public static final int MAX_SOLUTIONS = 100;
+	
+
+	/**
+	 * Sets up based on the given ints.
+	 * Assume client has passed in valid input
+	 */
+	public Sudoku(int[][] ints) {
+		initGrid(ints);
+	}
+	
+	/**
+	 * Solves the puzzle, invoking the underlying recursive search.
+	 */
+	public int solve() {
+		return 0; // YOUR CODE HERE
+	}
+	
+	public 
+	
+	public String getSolutionText() {
+		return ""; // YOUR CODE HERE
+	}
+	
+	public long getElapsed() {
+		return 0; // YOUR CODE HERE
+	}
+	
+	// Fills the game grid with correct starter information
+	public void initGrid(int[][] ints) {
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				grid[i][j] = ints[i][j];
+			}
+		}
+	}
+	
+    // -------------------------------- Spot Code ---------------------------------- //
+	
+	public class Spot {
+		private int row;
+		private int col;
+		private int sqNum;
+		
+		private void Spot(int rowNum, int colNum) {
+			this.row = rowNum;
+			this.col = colNum;
+			//Set sqNum
+			
+		}
+		
+		private void set(int value) {
+			grid[row][col] = value;
+		}
+		
+		// returns an int array of the spot's row
+		private int[] getRow() {
+			// TODO
+		}
+		
+		// returns an int array of the spot's column
+		private int[] getColumn() {
+			// TODO
+		}
+		
+		// returns true if value can be placed in spot
+		private boolean isLegal(int value) {
+			// TODO
+		}
+		
+			private boolean rowLegal(int value) {
+				// TODO
+			}
+			
+			private boolean colLegal(int value) {
+				// TODO
+			}
+			
+			// checks if the number can be palced in its square
+			private boolean sqLegal(int value) {
+				// TODO
+			}
+		
+		// checks what square number the piece is in
+		private int findSqNum() {
+			// TODO
+		}
+
+	}
+	
+	// ------------------------ Provided Helper Methods ---------------------------- //
 	
 	// Provided various static utility methods to
 	// convert data formats to int[][] grid.
@@ -119,47 +179,56 @@ public class Sudoku {
 		System.arraycopy(a, 0, result, 0, found);
 		return result;
 	}
-
-
-	// Provided -- the deliverable main().
-	// You can edit to do easier cases, but turn in
-	// solving hardGrid.
-	public static void main(String[] args) {
-		Sudoku sudoku;
-		sudoku = new Sudoku(hardGrid);
-		
-		System.out.println(sudoku); // print the raw problem
-		int count = sudoku.solve();
-		System.out.println("solutions:" + count);
-		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
-		System.out.println(sudoku.getSolutionText());
-	}
+	
+	// ------------------------------ Constant Data ------------------------------- //
+	
+	// TODO move to top
+	
+	// Provided grid data for main/testing
+	// The instance variable strategy is up to you.
+	
+	// Provided easy 1 6 grid
+	// (can paste this text into the GUI too)
+	public static final int[][] easyGrid = Sudoku.stringsToGrid(
+	"1 6 4 0 0 0 0 0 2",
+	"2 0 0 4 0 3 9 1 0",
+	"0 0 5 0 8 0 4 0 7",
+	"0 9 0 0 0 6 5 0 0",
+	"5 0 0 1 0 2 0 0 8",
+	"0 0 8 9 0 0 0 3 0",
+	"8 0 9 0 4 0 2 0 0",
+	"0 7 3 5 0 9 0 0 1",
+	"4 0 0 0 0 0 6 7 9");
 	
 	
+	// Provided medium 5 3 grid
+	public static final int[][] mediumGrid = Sudoku.stringsToGrid(
+	 "530070000",
+	 "600195000",
+	 "098000060",
+	 "800060003",
+	 "400803001",
+	 "700020006",
+	 "060000280",
+	 "000419005",
+	 "000080079");
 	
-
-	/**
-	 * Sets up based on the given ints.
-	 */
-	public Sudoku(int[][] ints) {
-		// YOUR CODE HERE
-	}
+	// Provided hard 3 7 grid
+	// 1 solution this way, 6 solutions if the 7 is changed to 0
+	public static final int[][] hardGrid = Sudoku.stringsToGrid(
+	"3 7 0 0 0 0 0 8 0",
+	"0 0 1 0 9 3 0 0 0",
+	"0 4 0 7 8 0 0 0 3",
+	"0 9 3 8 0 0 0 1 2",
+	"0 0 0 0 4 0 0 0 0",
+	"5 2 0 0 0 6 7 9 0",
+	"6 0 0 0 2 1 0 4 0",
+	"0 0 0 5 3 0 9 0 0",
+	"0 3 0 0 0 0 0 5 1");
 	
 	
-	
-	/**
-	 * Solves the puzzle, invoking the underlying recursive search.
-	 */
-	public int solve() {
-		return 0; // YOUR CODE HERE
-	}
-	
-	public String getSolutionText() {
-		return ""; // YOUR CODE HERE
-	}
-	
-	public long getElapsed() {
-		return 0; // YOUR CODE HERE
-	}
+	public static final int SIZE = 9;  // size of the whole 9x9 puzzle
+	public static final int PART = 3;  // size of each 3x3 part
+	public static final int MAX_SOLUTIONS = 100;
 
 }
