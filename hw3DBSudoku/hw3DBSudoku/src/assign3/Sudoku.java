@@ -8,19 +8,24 @@ import java.util.*;
  */
 public class Sudoku {
 
+	private int[][] startergrid;
 	private int[][] grid; 
+	private int solutionCount;
+	private boolean printed;
 	
 	// Provided Main
 	public static void main(String[] args) {
-//		Sudoku sudoku;
-//		sudoku = new Sudoku(hardGrid);
+		Sudoku sudoku;
+		sudoku = new Sudoku(hardGrid);
 		
-//		System.out.println(sudoku); // print the raw problem
-//		System.out.println(grid);
-//		int count = sudoku.solve();
-//		System.out.println("solutions:" + count);
-//		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
-//		System.out.println(sudoku.getSolutionText());
+
+		
+		
+		System.out.println(sudoku); // print the raw problem
+		int count = sudoku.solve();
+		System.out.println("solutions:" + count);
+		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
+		System.out.println(sudoku.getSolutionText());
 	}
 	
 	
@@ -31,7 +36,44 @@ public class Sudoku {
 	 * Assume client has passed in valid input
 	 */
 	public Sudoku(int[][] ints) {
-		initGrid(ints);
+		this.startergrid = ints;
+		this.grid = ints;
+		this.solutionCount = 0;
+		this.printed = false;
+		
+		// testing
+		printGrid();
+		System.out.println();
+
+		
+		// verified
+//		// get row 
+//		for (int i = 0; i < SIZE; i++) {
+//			Spot sp = new Spot(i,i);
+//			System.out.println(i2s(sp.getRow()));
+//		}
+//		
+//		System.out.println();
+//		
+//		//get col
+//		for (int i = 0; i < SIZE; i++) {
+//			Spot sp = new Spot(i,i);
+//			System.out.println(i2s(sp.getColumn()));
+//		}		
+//		// get Square
+//		// VALIDATED
+//		Spot sp = new Spot(2,8);
+//		System.out.println(i2s(sp.getSq()));
+		
+//		// check legality
+//		// VALIDATED
+//		Spot sp = new Spot(7,0);
+//		int value = 1;
+//		System.out.println(sp.rowLegal(value));
+//		System.out.println(sp.colLegal(value));
+//		System.out.println(sp.sqLegal(value));
+		
+		
 	}
 	
 	/**
@@ -41,8 +83,6 @@ public class Sudoku {
 		return 0; // YOUR CODE HERE
 	}
 	
-	public 
-	
 	public String getSolutionText() {
 		return ""; // YOUR CODE HERE
 	}
@@ -51,65 +91,125 @@ public class Sudoku {
 		return 0; // YOUR CODE HERE
 	}
 	
-	// Fills the game grid with correct starter information
-	public void initGrid(int[][] ints) {
+	// Debugging Methods --- not really necessary
+	
+	public void printGrid() {
 		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				grid[i][j] = ints[i][j];
-			}
+			printRow(i);
 		}
 	}
+	
+	public void printRow(int i) {
+		String row = "";
+		for (int j = 0; j < SIZE; j++) {
+			row += " " + grid[i][j] + " ";
+		}
+		System.out.println(row);
+	}
+	
+	public void printCol(int i) {
+		String col = "";
+		for (int j = 0; j < SIZE; j++) {
+			col += " " + grid[j][i] + " ";
+		}
+		System.out.println(col);
+	}
+	
+	public String i2s(int[] array) {
+		String str = "";
+		for (int i = 0; i < array.length; i++) {
+			str += " " + array[i] + " ";
+		}
+		return str;
+	}
+	
 	
     // -------------------------------- Spot Code ---------------------------------- //
 	
 	public class Spot {
 		private int row;
 		private int col;
-		private int sqNum;
+		private ArrayList<Integer> candidates;
 		
-		private void Spot(int rowNum, int colNum) {
+		public Spot(int rowNum, int colNum) {
 			this.row = rowNum;
 			this.col = colNum;
-			//Set sqNum
+			this.candidates = setCandidates();
 			
 		}
 		
-		private void set(int value) {
+		// method that allows the spot to set the value
+		public void set(int value) {
 			grid[row][col] = value;
+		}
+		
+		private ArrayList<Integer> setCandidates() {
+			ArrayList<Integer> allowables = new ArrayList<Integer>();
+			for (int i = 0; i < SIZE; i++) {
+				if (isLegal(i)) allowables.add(i);
+			}
+			return allowables;
+		}
+		
+		// returns true if value can be placed in spot
+		private boolean isLegal(int val) {
+			return (rowLegal(val) && colLegal(val) && sqLegal(val));
 		}
 		
 		// returns an int array of the spot's row
 		private int[] getRow() {
-			// TODO
+			int[] rRow = grid[row];
+			return rRow;
 		}
 		
 		// returns an int array of the spot's column
 		private int[] getColumn() {
-			// TODO
+			int[] rCol = new int[SIZE];
+			for (int j = 0; j < SIZE; j++) {
+				rCol[j] = grid[j][col];
+			}
+			return rCol;
 		}
 		
-		// returns true if value can be placed in spot
-		private boolean isLegal(int value) {
-			// TODO
+		// returns the integer array of numbers in the square of the spot
+		private int[] getSq() {
+			int startRow = row/SQ_SIZE * SQ_SIZE;
+			int startCol = col/SQ_SIZE * SQ_SIZE;
+			
+			int[] sqNumbers = new int[SIZE];
+			int  count = 0;
+			for (int i = 0; i < SQ_SIZE; i++) {
+				for (int j = 0; j < SQ_SIZE; j++) {
+					sqNumbers[count] = grid[startRow + i][startCol + j];
+					count++;
+				}
+			}
+			return sqNumbers;
 		}
-		
+			
+			// checks if value can legally be placed in spot's row
 			private boolean rowLegal(int value) {
-				// TODO
+				return (intArrayNotContains(getRow(), value));
 			}
 			
+			// checks if value can legally be placed in spot's column
 			private boolean colLegal(int value) {
-				// TODO
+				return (intArrayNotContains(getColumn(), value));
 			}
 			
-			// checks if the number can be palced in its square
+			// checks if value can legally be palced in spot's square
 			private boolean sqLegal(int value) {
-				// TODO
+				return (intArrayNotContains(getSq(), value));
 			}
+				
+				private boolean intArrayNotContains(int[] array, int value) {
+					for (int i = 0; i < array.length; i++) {
+						if (array[i] == value) return false;
+					}
+					return true;
+				}
 		
-		// checks what square number the piece is in
-		private int findSqNum() {
-			// TODO
-		}
+
 
 	}
 	
@@ -229,6 +329,7 @@ public class Sudoku {
 	
 	
 	public static final int SIZE = 9;  // size of the whole 9x9 puzzle
+	public static final int SQ_SIZE = 3; // side length of each square
 	public static final int PART = 3;  // size of each 3x3 part
 	public static final int MAX_SOLUTIONS = 100;
 
