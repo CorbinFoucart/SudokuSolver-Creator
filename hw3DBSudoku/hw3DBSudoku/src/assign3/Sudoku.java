@@ -10,12 +10,13 @@ public class Sudoku {
 
 	private int[][] grid; 
 	
-	// Provided Mmin
+	// Provided Main
 	public static void main(String[] args) {
-		Sudoku sudoku;
-		sudoku = new Sudoku(hardGrid);
+//		Sudoku sudoku;
+//		sudoku = new Sudoku(hardGrid);
 		
-		System.out.println(sudoku); // print the raw problem
+//		System.out.println(sudoku); // print the raw problem
+//		System.out.println(grid);
 //		int count = sudoku.solve();
 //		System.out.println("solutions:" + count);
 //		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
