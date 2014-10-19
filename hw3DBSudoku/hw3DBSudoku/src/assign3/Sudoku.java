@@ -12,6 +12,7 @@ public class Sudoku {
 	private int[][] grid; 
 	private int solutionCount;
 	private boolean printed;
+	private ArrayList<Spot> emptySpots;
 	
 	// Provided Main
 	public static void main(String[] args) {
@@ -21,11 +22,11 @@ public class Sudoku {
 
 		
 		
-		System.out.println(sudoku); // print the raw problem
-		int count = sudoku.solve();
-		System.out.println("solutions:" + count);
-		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
-		System.out.println(sudoku.getSolutionText());
+//		System.out.println(sudoku); // print the raw problem
+//		int count = sudoku.solve();
+//		System.out.println("solutions:" + count);
+//		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
+//		System.out.println(sudoku.getSolutionText());
 	}
 	
 	
@@ -41,11 +42,26 @@ public class Sudoku {
 		this.solutionCount = 0;
 		this.printed = false;
 		
+		// initialize empty spots
+		emptySpots = getEmptySpots();
+		Collections.sort(emptySpots);
+		
 		// testing
 		printGrid();
 		System.out.println();
-
 		
+		// empty spots
+		// validated
+		for (int i = 0; i < emptySpots.size(); i++) {
+			String str = emptySpots.get(i).getCandidates().toString();
+			System.out.println(str);
+		}
+
+//		// candidate testing
+//		Spot sp = new Spot(0,3);
+//		String Cstr = printCandidates(sp);
+//		System.out.println(Cstr);
+
 		// verified
 //		// get row 
 //		for (int i = 0; i < SIZE; i++) {
@@ -76,11 +92,26 @@ public class Sudoku {
 		
 	}
 	
+	public ArrayList<Spot> getEmptySpots() {
+		ArrayList<Spot> eSpots = new ArrayList<Spot>();
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				if (grid[i][j] == 0) {
+					Spot sp = new Spot(i,j);
+					eSpots.add(sp);
+				}
+			}
+		}
+		return eSpots;
+	}
+	
+	
+	
 	/**
 	 * Solves the puzzle, invoking the underlying recursive search.
 	 */
 	public int solve() {
-		return 0; // YOUR CODE HERE
+		return 0;
 	}
 	
 	public String getSolutionText() {
@@ -91,42 +122,13 @@ public class Sudoku {
 		return 0; // YOUR CODE HERE
 	}
 	
-	// Debugging Methods --- not really necessary
-	
-	public void printGrid() {
-		for (int i = 0; i < SIZE; i++) {
-			printRow(i);
-		}
-	}
-	
-	public void printRow(int i) {
-		String row = "";
-		for (int j = 0; j < SIZE; j++) {
-			row += " " + grid[i][j] + " ";
-		}
-		System.out.println(row);
-	}
-	
-	public void printCol(int i) {
-		String col = "";
-		for (int j = 0; j < SIZE; j++) {
-			col += " " + grid[j][i] + " ";
-		}
-		System.out.println(col);
-	}
-	
-	public String i2s(int[] array) {
-		String str = "";
-		for (int i = 0; i < array.length; i++) {
-			str += " " + array[i] + " ";
-		}
-		return str;
-	}
+
 	
 	
     // -------------------------------- Spot Code ---------------------------------- //
 	
-	public class Spot {
+	public class Spot implements Comparable<Spot> {
+		private int value;
 		private int row;
 		private int col;
 		private ArrayList<Integer> candidates;
@@ -134,6 +136,7 @@ public class Sudoku {
 		public Spot(int rowNum, int colNum) {
 			this.row = rowNum;
 			this.col = colNum;
+			this.value = grid[rowNum][colNum];
 			this.candidates = setCandidates();
 			
 		}
@@ -143,9 +146,21 @@ public class Sudoku {
 			grid[row][col] = value;
 		}
 		
-		private ArrayList<Integer> setCandidates() {
+		public ArrayList<Integer> getCandidates() {
+			return candidates;
+		}
+		
+		@Override
+		public int compareTo(Spot sp) {
+			if (candidates.size() < sp.getCandidates().size()) return -1;
+			if (candidates.size() == sp.getCandidates().size()) return 0;
+			return 1;
+		}
+		
+		// checks each 1-9 number and returns an array list of possible matches
+		private ArrayList<Integer> setCandidates() {			
 			ArrayList<Integer> allowables = new ArrayList<Integer>();
-			for (int i = 0; i < SIZE; i++) {
+			for (int i = 1; i <= SIZE; i++) {
 				if (isLegal(i)) allowables.add(i);
 			}
 			return allowables;
@@ -201,7 +216,7 @@ public class Sudoku {
 			private boolean sqLegal(int value) {
 				return (intArrayNotContains(getSq(), value));
 			}
-				
+				// returns true if an int array does not contain some int value
 				private boolean intArrayNotContains(int[] array, int value) {
 					for (int i = 0; i < array.length; i++) {
 						if (array[i] == value) return false;
@@ -279,6 +294,48 @@ public class Sudoku {
 		int[] result = new int[found];
 		System.arraycopy(a, 0, result, 0, found);
 		return result;
+	}
+	
+	// Debugging Methods ------- not really necessary
+	
+	public void printGrid() {
+		for (int i = 0; i < SIZE; i++) {
+			printRow(i);
+		}
+	}
+	
+	public void printRow(int i) {
+		String row = "";
+		for (int j = 0; j < SIZE; j++) {
+			row += " " + grid[i][j] + " ";
+		}
+		System.out.println(row);
+	}
+	
+	public void printCol(int i) {
+		String col = "";
+		for (int j = 0; j < SIZE; j++) {
+			col += " " + grid[j][i] + " ";
+		}
+		System.out.println(col);
+	}
+	
+	public String i2s(int[] array) {
+		String str = "";
+		for (int i = 0; i < array.length; i++) {
+			str += " " + array[i] + " ";
+		}
+		return str;
+	}
+	
+	public String printCandidates(Spot sp) {
+		String str = "";
+		ArrayList<Integer> candidates = sp.getCandidates();
+		for (int i = 0; i < candidates.size(); i++) {
+			str += candidates.get(i).toString() + " ";
+			
+		}
+		return str;
 	}
 	
 	// ------------------------------ Constant Data ------------------------------- //
