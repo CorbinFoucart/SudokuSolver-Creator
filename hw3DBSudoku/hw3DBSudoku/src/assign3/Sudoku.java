@@ -8,88 +8,37 @@ import java.util.*;
  */
 public class Sudoku {
 
-	private int[][] startergrid;
 	private int[][] grid; 
-	private int solutionCount;
-	private boolean printed;
-	private ArrayList<Spot> emptySpots;
+	private int count;
+	private long startTime;
+	private long endTime;
+	private ArrayList<int[][]> solns;
+	public ArrayList<Spot> emptySpots;
 	
 	// Provided Main
 	public static void main(String[] args) {
 		Sudoku sudoku;
 		sudoku = new Sudoku(hardGrid);
+		System.out.println(sudoku); // print the raw problem
 		
-
-		
-		
-//		System.out.println(sudoku); // print the raw problem
-//		int count = sudoku.solve();
-//		System.out.println("solutions:" + count);
-//		System.out.println("elapsed:" + sudoku.getElapsed() + "ms");
-//		System.out.println(sudoku.getSolutionText());
+		int count = sudoku.solve();
+		System.out.println("solutions:" + count);
+		System.out.println("elapsed:" + sudoku.getElapsed() + " ms");
+		System.out.println(sudoku.getSolutionText());
 	}
-	
-	
-	
 
 	/**
 	 * Sets up based on the given ints.
 	 * Assume client has passed in valid input
 	 */
 	public Sudoku(int[][] ints) {
-		this.startergrid = ints;
 		this.grid = ints;
-		this.solutionCount = 0;
-		this.printed = false;
+		this.count = 0;
+		this.solns = new ArrayList<int[][]>();
 		
 		// initialize empty spots
 		emptySpots = getEmptySpots();
-		Collections.sort(emptySpots);
-		
-		// testing
-		printGrid();
-		System.out.println();
-		
-		// empty spots
-		// validated
-		for (int i = 0; i < emptySpots.size(); i++) {
-			String str = emptySpots.get(i).getCandidates().toString();
-			System.out.println(str);
-		}
-
-//		// candidate testing
-//		Spot sp = new Spot(0,3);
-//		String Cstr = printCandidates(sp);
-//		System.out.println(Cstr);
-
-		// verified
-//		// get row 
-//		for (int i = 0; i < SIZE; i++) {
-//			Spot sp = new Spot(i,i);
-//			System.out.println(i2s(sp.getRow()));
-//		}
-//		
-//		System.out.println();
-//		
-//		//get col
-//		for (int i = 0; i < SIZE; i++) {
-//			Spot sp = new Spot(i,i);
-//			System.out.println(i2s(sp.getColumn()));
-//		}		
-//		// get Square
-//		// VALIDATED
-//		Spot sp = new Spot(2,8);
-//		System.out.println(i2s(sp.getSq()));
-		
-//		// check legality
-//		// VALIDATED
-//		Spot sp = new Spot(7,0);
-//		int value = 1;
-//		System.out.println(sp.rowLegal(value));
-//		System.out.println(sp.colLegal(value));
-//		System.out.println(sp.sqLegal(value));
-		
-		
+		Collections.sort(emptySpots);		
 	}
 	
 	public ArrayList<Spot> getEmptySpots() {
@@ -103,23 +52,54 @@ public class Sudoku {
 			}
 		}
 		return eSpots;
-	}
-	
-	
+	}	
 	
 	/**
 	 * Solves the puzzle, invoking the underlying recursive search.
 	 */
 	public int solve() {
-		return 0;
+		startTime = System.currentTimeMillis();
+		if (count > MAX_SOLUTIONS) return 0;
+		if (emptySpots.isEmpty()) {
+			this.solns.add(grid);
+			return 1;
+		} else {
+			Spot sp = emptySpots.get(0);
+			ArrayList<Integer> cand = sp.getCandidates();
+			if (cand.isEmpty()) {
+				return 0;
+			}else {	
+//				int val = cand.get(0);
+				
+				for (int i = 0; i < cand.size(); i++){
+					int[][] nextGrid = new int[SIZE][SIZE];
+					copyGrid(nextGrid, grid);
+					nextGrid[sp.row][sp.col] = cand.get(i); 
+					Sudoku nextSudoku = new Sudoku(nextGrid);
+					nextSudoku.solns = this.solns;
+					count += nextSudoku.solve();
+				}
+			}			
+		}
+		endTime = System.currentTimeMillis();
+		return count;
+	}
+	
+	private void copyGrid(int[][] int1, int[][] int2) {
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				int1[i][j] = int2[i][j];
+			}
+		}
 	}
 	
 	public String getSolutionText() {
-		return ""; // YOUR CODE HERE
+		if (solns.isEmpty()) return "";
+		return ia2s(solns.get(0));
 	}
 	
 	public long getElapsed() {
-		return 0; // YOUR CODE HERE
+		return endTime - startTime;
 	}
 	
 
@@ -296,20 +276,24 @@ public class Sudoku {
 		return result;
 	}
 	
-	// Debugging Methods ------- not really necessary
-	
-	public void printGrid() {
+	// Sanity Check Methods ------- not really necessary
+	@Override
+	public String toString() {
+		StringBuilder gridString = new StringBuilder();
 		for (int i = 0; i < SIZE; i++) {
-			printRow(i);
+			String row = printRow(i);
+			gridString.append(row);
+			gridString.append("\n");
 		}
+		return gridString.toString();
 	}
 	
-	public void printRow(int i) {
+	public String printRow(int i) {
 		String row = "";
 		for (int j = 0; j < SIZE; j++) {
-			row += " " + grid[i][j] + " ";
+			row += " " + grid[i][j];
 		}
-		System.out.println(row);
+		return row;
 	}
 	
 	public void printCol(int i) {
@@ -320,10 +304,20 @@ public class Sudoku {
 		System.out.println(col);
 	}
 	
+	public String ia2s(int[][] array) {
+		StringBuilder printStr = new StringBuilder();
+		for (int i = 0; i < array.length; i++) {
+			int[] row = array[i];
+			printStr.append(i2s(row));
+			printStr.append("\n");
+		}
+		return printStr.toString();
+	}
+	
 	public String i2s(int[] array) {
 		String str = "";
 		for (int i = 0; i < array.length; i++) {
-			str += " " + array[i] + " ";
+			str += " " + array[i];
 		}
 		return str;
 	}
@@ -384,10 +378,107 @@ public class Sudoku {
 	"0 0 0 5 3 0 9 0 0",
 	"0 3 0 0 0 0 0 5 1");
 	
+	public static final int[][] x2Grid = Sudoku.stringsToGrid(
+	"9 0 6 0 7 0 4 0 3",
+	"0 0 0 4 0 0 2 0 0",
+	"0 7 0 0 2 3 0 1 0",
+	"5 0 0 0 0 0 1 0 0",
+	"0 4 0 2 0 8 0 6 0",
+	"0 0 3 0 0 0 0 0 5",
+	"0 3 0 7 0 0 0 5 0",
+	"0 0 7 0 0 5 0 0 0",
+	"4 0 5 0 1 0 7 0 8");
+	
+	public static final int[][] noSolGrid = Sudoku.stringsToGrid(
+	"1 2 3 4 5 6 7 8 0",
+	"0 0 0 0 0 0 0 0 9",
+	"0 0 0 0 0 0 0 0 8",
+	"0 0 0 0 0 0 0 0 7",
+	"0 0 0 0 0 0 0 0 6",
+	"0 0 0 0 0 0 0 0 5",
+	"0 0 0 0 0 0 0 0 4",
+	"0 0 0 0 0 0 0 0 3",
+	"0 0 0 0 0 0 0 0 2");
+	
+	public static final int[][] solvedGrid = Sudoku.stringsToGrid(
+	"2 9 5 7 4 3 8 6 1",
+	"4 3 1 8 6 5 9 2 7",
+	"8 7 6 1 9 2 5 4 3",
+	"3 8 7 4 5 9 2 1 6",
+	"6 1 2 3 8 7 4 9 5",
+	"5 4 9 2 1 6 7 3 8",
+	"7 6 3 5 3 4 1 8 9",
+	"9 2 8 6 7 1 3 5 4",
+	"1 5 4 9 3 8 6 7 2");
+	
+	public static final int[][] blankGrid = Sudoku.stringsToGrid(
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0",
+	"0 0 0 0 0 0 0 0 0");
+	
 	
 	public static final int SIZE = 9;  // size of the whole 9x9 puzzle
 	public static final int SQ_SIZE = 3; // side length of each square
 	public static final int PART = 3;  // size of each 3x3 part
 	public static final int MAX_SOLUTIONS = 100;
 
+	// -------------------------------- Graveyard testing code ------------------------------------- //
+	
+//	// testing
+//	printGrid();
+//	System.out.println();
+//	
+//	 empty spots
+//	 validated
+//	printGrid();
+//	for (int i = 0; i < emptySpots.size(); i++) {
+//		String str = emptySpots.get(i).getCandidates().toString();
+//		System.out.println(str);
+//	}
+//	System.out.println();
+//	
+//	
+//	System.out.println(emptySpots.size());
+//	
+//	System.out.println();
+//	System.out.println(solve());
+//
+//	// candidate testing
+//	Spot sp = new Spot(0,3);
+//	String Cstr = printCandidates(sp);
+//	System.out.println(Cstr);
+//
+//	// verified
+//	// get row 
+//	for (int i = 0; i < SIZE; i++) {
+//		Spot sp = new Spot(i,i);
+//		System.out.println(i2s(sp.getRow()));
+//	}
+//	
+//	System.out.println();
+//	
+//	//get col
+//	for (int i = 0; i < SIZE; i++) {
+//		Spot sp = new Spot(i,i);
+//		System.out.println(i2s(sp.getColumn()));
+//	}		
+//	// get Square
+//	// VALIDATED
+//	Spot sp = new Spot(2,8);
+//	System.out.println(i2s(sp.getSq()));
+//	
+//	// check legality
+//	// VALIDATED
+//	Spot sp = new Spot(7,0);
+//	int value = 1;
+//	System.out.println(sp.rowLegal(value));
+//	System.out.println(sp.colLegal(value));
+//	System.out.println(sp.sqLegal(value));
+	
 }
