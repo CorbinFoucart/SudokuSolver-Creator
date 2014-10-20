@@ -4,12 +4,12 @@ import java.util.*;
 
 /*
  * Encapsulates a Sudoku grid to be solved.
- * CS108 Stanford.
+ * COURSE: CS108, Stanford 2014.
  */
 public class Sudoku {
 
 	private int[][] grid; 
-	private int count;
+	public int count;
 	private long startTime;
 	private long endTime;
 	private ArrayList<int[][]> solns;
@@ -18,7 +18,7 @@ public class Sudoku {
 	// Provided Main
 	public static void main(String[] args) {
 		Sudoku sudoku;
-		sudoku = new Sudoku(hardGrid);
+		sudoku = new Sudoku(blankGrid);
 		System.out.println(sudoku); // print the raw problem
 		
 		int count = sudoku.solve();
@@ -59,7 +59,7 @@ public class Sudoku {
 	 */
 	public int solve() {
 		startTime = System.currentTimeMillis();
-		if (count > MAX_SOLUTIONS) return 0;
+		if (solns.size() >= MAX_SOLUTIONS) return 0;
 		if (emptySpots.isEmpty()) {
 			this.solns.add(grid);
 			return 1;
@@ -67,6 +67,7 @@ public class Sudoku {
 			Spot sp = emptySpots.get(0);
 			ArrayList<Integer> cand = sp.getCandidates();
 			if (cand.isEmpty()) {
+				endTime = System.currentTimeMillis();
 				return 0;
 			}else {	
 //				int val = cand.get(0);
@@ -100,6 +101,25 @@ public class Sudoku {
 	
 	public long getElapsed() {
 		return endTime - startTime;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder gridString = new StringBuilder();
+		for (int i = 0; i < SIZE; i++) {
+			String row = printRow(i);
+			gridString.append(row);
+			gridString.append("\n");
+		}
+		return gridString.toString();
+	}
+	
+	public String printRow(int i) {
+		String row = "";
+		for (int j = 0; j < SIZE; j++) {
+			row += " " + grid[i][j];
+		}
+		return row;
 	}
 	
 
@@ -203,12 +223,10 @@ public class Sudoku {
 					}
 					return true;
 				}
-		
-
 
 	}
 	
-	// ------------------------ Provided Helper Methods ---------------------------- //
+	// ---------------------------------- Provided Helper Methods ------------------------------------- //
 	
 	// Provided various static utility methods to
 	// convert data formats to int[][] grid.
@@ -276,25 +294,7 @@ public class Sudoku {
 		return result;
 	}
 	
-	// Sanity Check Methods ------- not really necessary
-	@Override
-	public String toString() {
-		StringBuilder gridString = new StringBuilder();
-		for (int i = 0; i < SIZE; i++) {
-			String row = printRow(i);
-			gridString.append(row);
-			gridString.append("\n");
-		}
-		return gridString.toString();
-	}
-	
-	public String printRow(int i) {
-		String row = "";
-		for (int j = 0; j < SIZE; j++) {
-			row += " " + grid[i][j];
-		}
-		return row;
-	}
+	//  --------------------- Sanity Check Methods; not really necessary ------------------------- //
 	
 	public void printCol(int i) {
 		String col = "";
