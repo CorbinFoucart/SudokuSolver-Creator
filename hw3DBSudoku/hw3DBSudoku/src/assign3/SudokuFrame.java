@@ -58,6 +58,7 @@ import java.awt.event.*;
 		
 		editor = new JTextArea(15,20);
 		editor.setLineWrap(true);
+		
 		final Document doc = editor.getDocument();
 		doc.addDocumentListener(
 				
