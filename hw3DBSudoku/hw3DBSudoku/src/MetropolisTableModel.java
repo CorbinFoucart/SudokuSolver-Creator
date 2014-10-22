@@ -21,10 +21,6 @@ import assign3.MyDBInfo;
 public class MetropolisTableModel extends AbstractTableModel {
 	
 	private ArrayList<String> colNames;
-//	private ArrayList<ArrayList> data;
-//	private ArrayList<String> nameData;
-//	private ArrayList<String> contData;
-//	private ArrayList<Long> popData;
 	private Connection con;
 	private ResultSet rs;
 	
@@ -55,11 +51,16 @@ public class MetropolisTableModel extends AbstractTableModel {
 		}
 	}
 	
-	// adds data from the text fields to the database
+	/**
+	 * Adds an entry to the database with the JTextField data, passed
+	 * in here as parameters from the view. 
+	 * Assumes the data is complete and conforms to requirements.
+	 * Updates the view once the change to the model has been made.
+	 * @param metropolis - string of city name
+	 * @param continent - string of continent name
+	 * @param population - string of Long representing population
+	 */
 	public void add(String metropolis, String continent, String population) {
-		System.out.println(metropolis);
-		System.out.println(continent);
-		System.out.println(population);
 		
 		try {
 			Statement stmt;
@@ -75,6 +76,14 @@ public class MetropolisTableModel extends AbstractTableModel {
 		this.fireTableDataChanged();
 	}
 	
+		/**
+		 * Helper method for add(); constructs a valid execute string in mySQL
+		 * consisting of the command to add a city (along with continent & population).
+		 * @param met - string of metropolis name
+		 * @param con - string of continent name
+		 * @param pop - string of population (Long) type
+		 * @return mySQL executeUpdate string
+		 */
 		private String buildInsertString(String met, String con, String pop) {
 			String insertString = "";
 			String values = " VALUES(\"" + met + "\", \"" + con + "\", \"" + pop + "\");";
@@ -82,29 +91,41 @@ public class MetropolisTableModel extends AbstractTableModel {
 			return insertString;
 		}
 	
-	// gets entire database, saves it to model ivars
+	/**
+	 * Queries for the entire database; sets internal model to reflect the query.
+	 * Used when a user enters a balnk search query.
+	 * Updates the view once query has succesfully been completed. 
+	 */
 	public void getDatabase() {
 		try {
 			Statement stmt;
 			stmt = con.createStatement();
 			stmt.executeQuery("USE " + database);
 			rs = stmt.executeQuery("SELECT * FROM metropolises ORDER BY metropolis;");
-			
-			while(rs.next()) {
-				String name = rs.getString("metropolis");
-				String conName = rs.getString("continent");
-				long pop = rs.getLong("population");
-				
-				System.out.println(name + "\t" + conName + "\t" + pop);
-			}
 			this.fireTableDataChanged();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}	
 	}
-	
-	public void exactSearch(String metr, String cont, String popu, boolean greater) {
-		String query = buildExactString(metr, cont, popu, greater);
+
+	/**
+	 * Allows the user to search the database using the JTextFields. Method 
+	 * builds a query string based on the JTextField strings and the JComboBox options
+	 * (exact or partial search / greater than or less than or equal to (for population))
+	 * 
+	 * Once the query string is built, Search() queries the database and updates the model
+	 * to reflect the results of the search. Lastly, Search() notifies the view of the changes.
+	 * @param metr - string of metropolis name
+	 * @param cont - string of continent name
+	 * @param popu - string of population (Long)
+	 * @param greater - boolean denoting whether the population search should
+	 * 					return greater than / less than or equal to the population value. 
+	 * @param exact - boolean denoting whether an exact or partial search is preferred.
+	 */
+	public void Search(String metr, String cont, String popu, 
+			boolean greater, boolean exact) {
+		String query = buildSearchString(metr, cont, popu, greater, exact);
+//		System.out.println(query);
 		
 		try {
 			Statement stmt;
@@ -119,18 +140,43 @@ public class MetropolisTableModel extends AbstractTableModel {
 		
 		
 	}
-	
-		public String buildExactString(String metr, String cont, String popu, boolean greater) {
+		/**
+		 *  Helper method for Search() that constructs the mySQL query string, given the 
+		 *  inputs to Search().
+		 *   
+		 *  EX. Input: ("Rome", "Europe", "", true, true)
+		 *  Output: "SELECT * FROM metropolises WHERE metropolis = "Boston" AND continent = Europe;"
+		 *   
+	     * @param metr - string of metropolis name
+	     * @param cont - string of continent name
+	     * @param popu - string of population (Long)
+	     * @param greater - boolean denoting whether the population search should
+	     * 					return greater than / less than or equal to the population value. 
+	     * @param exact - boolean denoting whether an exact or partial search is preferred.
+		 * @return - mySQL query string
+		 */
+		public String buildSearchString(String metr, String cont, String popu, 
+				boolean greater, boolean exact) {
 			String qString = "SELECT * FROM " + dbase_name + " WHERE ";
 			
 			ArrayList<String> queries = new ArrayList<String>();
 			if (!metr.equals("")) {
-				String str = "metropolis = \"" + metr + "\" ";
+				String str = "";
+				if (exact) {
+					str += "metropolis = \"" + metr + "\" ";
+				}else {
+					str += "metropolis LIKE \"" + "%" + metr + "%" + "\" ";
+				}				
 				queries.add(str);
 			}
 			
 			if (!cont.equals("")) {
-				String str = " continent = \"" + cont + "\" ";
+				String str = "";
+				if (exact) {
+					str += " continent = \"" + cont + "\" ";
+				} else {
+					str += " continent LIKE \"" + "%" + cont + "%" + "\" ";
+				}
 				queries.add(str);
 			}
 			
@@ -159,6 +205,10 @@ public class MetropolisTableModel extends AbstractTableModel {
 	
 	// ----------------------------- Overridden Methods ---------------------------------//
 	
+	/**
+	 * Overridden getRowCount() method of AbstractTableModel.
+	 * Returns the number of rows stored in the ResultSet object
+	 */
 	@Override
 	public int getRowCount() {
 		try {
@@ -171,7 +221,12 @@ public class MetropolisTableModel extends AbstractTableModel {
 		}	
 		return 0;
 	}
-
+	
+	/**
+	 * Overridden getColumnCount() method of AbstractTableModel.
+	 * Returns integer of the number of columns in the ResultSet object
+	 * after a database query.
+	 */
 	@Override
 	public int getColumnCount() {
 		try {
@@ -184,11 +239,23 @@ public class MetropolisTableModel extends AbstractTableModel {
 		return 0;
 	}
 	
+	/**
+	 * Overridden getColumnName() method of AbstractTableModel.
+	 * Returns the string of the name from the instance variable array
+	 * of column names, which we know to be the same throughout the 
+	 * runtime of the class.
+	 */
 	@Override
 	public String getColumnName(int i) {
 		return colNames.get(i);
 	}
 
+	/**
+	 * Overridden getValueAt() method of AbstractTableModel.
+	 * Manipulates the cursor of the ResultSet object to return 
+	 * the correct table value. Note that we add one to indexes
+	 * because mySQL indexes from 1 rather than 0.
+	 */
 	@Override
 	public Object getValueAt(int arg0, int arg1) {
 		try {
@@ -206,30 +273,6 @@ public class MetropolisTableModel extends AbstractTableModel {
 	static String password = MyDBInfo.MYSQL_PASSWORD;
 	static String server = MyDBInfo.MYSQL_DATABASE_SERVER;
 	static String database = MyDBInfo.MYSQL_DATABASE_NAME;
-	static String dbase_name = "metropolises";
-	
-//	if (!metr.equals("")) {
-//		first = false;
-//		qString += "WHERE metropolis = \"" + metr + "\"";
-//	}
-//	
-//	if (!cont.equals("")) {
-//		if (first) {
-//			first = false;
-//			qString += " WHERE continent = \"" + cont + "\"";
-//		}else  {
-//			qString += " AND WHERE continent = \"" + cont + "\"";
-//		}
-//	}
-//	
-//	if (popu != null) {
-//		if (first) {
-//			first = false;
-//			qString += " WHERE population = \"" + popu + "\"";
-//		}else  {
-//			qString += " AND WHERE continent = \"" + popu + "\"";
-//		}
-//	}
-	
+	static String dbase_name = "metropolises";	
 	
 }

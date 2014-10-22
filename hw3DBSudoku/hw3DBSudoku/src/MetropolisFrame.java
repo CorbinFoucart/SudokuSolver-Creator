@@ -27,7 +27,7 @@ public class MetropolisFrame extends JFrame{
 	
 	JComponent content; 
 	
-	// ctor
+	
 	public MetropolisFrame() {
 		super("Metropolis Viewer");
 		
@@ -105,9 +105,11 @@ public class MetropolisFrame extends JFrame{
 				}else {
 					model.add(met, con, pop);
 					errorMessage.setText("");
-				}
-				
+					model.Search(met, con, pop, false, true);
+				}				
 				clearSearchBar();
+				
+				
 				
 			}
 		});
@@ -123,11 +125,9 @@ public class MetropolisFrame extends JFrame{
 					String met = MetSearch.getText();
 					String con = ConSearch.getText();
 					String pop = PopSearch.getText();
-					if (exact) {
-						model.exactSearch(met, con, pop, greater);
-					} else {
-//						model.partialSearch();
-					}
+					
+					model.Search(met, con, pop, greater, exact);
+
 				}
 				clearSearchBar();
 			}
@@ -139,7 +139,8 @@ public class MetropolisFrame extends JFrame{
 		sideBar.add(sideBarButtons);
 		
 		// Dropdowns
-		final String[] popStrings = { "Population larger than", "Population smaller than or equal to"};
+		final String[] popStrings = { "Population larger than",
+				"Population smaller than or equal to"};
 		final String[] searchStrings = {"Exact Search", "Partial Search"};
 
 		//Create the dropdowns

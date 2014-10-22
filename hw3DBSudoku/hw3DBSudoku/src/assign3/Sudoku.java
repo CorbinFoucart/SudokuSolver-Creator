@@ -334,8 +334,6 @@ public class Sudoku {
 	
 	// ------------------------------ Constant Data ------------------------------- //
 	
-	// TODO move to top
-	
 	// Provided grid data for main/testing
 	// The instance variable strategy is up to you.
 	
@@ -427,58 +425,5 @@ public class Sudoku {
 	public static final int SQ_SIZE = 3; // side length of each square
 	public static final int PART = 3;  // size of each 3x3 part
 	public static final int MAX_SOLUTIONS = 100;
-
-	// -------------------------------- Graveyard testing code ------------------------------------- //
-	
-//	// testing
-//	printGrid();
-//	System.out.println();
-//	
-//	 empty spots
-//	 validated
-//	printGrid();
-//	for (int i = 0; i < emptySpots.size(); i++) {
-//		String str = emptySpots.get(i).getCandidates().toString();
-//		System.out.println(str);
-//	}
-//	System.out.println();
-//	
-//	
-//	System.out.println(emptySpots.size());
-//	
-//	System.out.println();
-//	System.out.println(solve());
-//
-//	// candidate testing
-//	Spot sp = new Spot(0,3);
-//	String Cstr = printCandidates(sp);
-//	System.out.println(Cstr);
-//
-//	// verified
-//	// get row 
-//	for (int i = 0; i < SIZE; i++) {
-//		Spot sp = new Spot(i,i);
-//		System.out.println(i2s(sp.getRow()));
-//	}
-//	
-//	System.out.println();
-//	
-//	//get col
-//	for (int i = 0; i < SIZE; i++) {
-//		Spot sp = new Spot(i,i);
-//		System.out.println(i2s(sp.getColumn()));
-//	}		
-//	// get Square
-//	// VALIDATED
-//	Spot sp = new Spot(2,8);
-//	System.out.println(i2s(sp.getSq()));
-//	
-//	// check legality
-//	// VALIDATED
-//	Spot sp = new Spot(7,0);
-//	int value = 1;
-//	System.out.println(sp.rowLegal(value));
-//	System.out.println(sp.colLegal(value));
-//	System.out.println(sp.sqLegal(value));
 	
 }
