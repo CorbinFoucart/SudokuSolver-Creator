@@ -19,6 +19,11 @@ public class MetropolisFrame extends JFrame{
 	private JTextField ConSearch;
 	private JTextField PopSearch;
 	private JLabel errorMessage;
+	private boolean exact;
+	private boolean greater;
+	private JComboBox searchList;
+	private JComboBox popList;
+	
 	
 	JComponent content; 
 	
@@ -114,7 +119,17 @@ public class MetropolisFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				if (fieldsEmpty()) {
 					model.getDatabase();
+				}else {
+					String met = MetSearch.getText();
+					String con = ConSearch.getText();
+					String pop = PopSearch.getText();
+					if (exact) {
+						model.exactSearch(met, con, pop, greater);
+					} else {
+//						model.partialSearch();
+					}
 				}
+				clearSearchBar();
 			}
 		});
 			
@@ -124,19 +139,46 @@ public class MetropolisFrame extends JFrame{
 		sideBar.add(sideBarButtons);
 		
 		// Dropdowns
-		String[] popStrings = { "Population larger than", "Population smaller than or equal to"};
-		String[] searchStrings = {"Exact Search", "Partial Search"};
+		final String[] popStrings = { "Population larger than", "Population smaller than or equal to"};
+		final String[] searchStrings = {"Exact Search", "Partial Search"};
 
 		//Create the dropdowns
 		JPanel sideBarDropDowns = new JPanel(new GridLayout(3,1));
-		JComboBox popList = new JComboBox(popStrings);
-		popList.setSelectedIndex(0);
-		JComboBox searchList = new JComboBox(searchStrings);
-		searchList.setSelectedIndex(0);
+		
+			popList = new JComboBox(popStrings);
+			popList.setSelectedIndex(0);
+			popList.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String str = popList.getSelectedItem().toString();
+					if (str.equals(popStrings[0])) {
+						greater = true;
+					}else {
+						greater = false;
+					}
+				}			
+			});
+			greater = true;
+			
+			
+			searchList = new JComboBox(searchStrings);
+			searchList.setSelectedIndex(0);
+			searchList.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String str = searchList.getSelectedItem().toString();
+					if (str.equals(searchStrings[0])) {
+						exact = true;
+					}else {
+						exact = false;
+					}
+				}			
+			});
+			exact = true;
+		
 		sideBarDropDowns.add(popList, BorderLayout.NORTH);
 		sideBarDropDowns.add(searchList, BorderLayout.SOUTH);
 		sideBarDropDowns.setBorder(new TitledBorder("Search Options"));
 		sideBar.add(sideBarDropDowns);
+		
 		
 		// error message space
 		errorMessage = new JLabel("");

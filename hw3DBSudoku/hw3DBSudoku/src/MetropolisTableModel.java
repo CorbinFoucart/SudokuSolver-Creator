@@ -103,35 +103,53 @@ public class MetropolisTableModel extends AbstractTableModel {
 		}	
 	}
 	
-	public void exactSearch(String metr, String cont, Long popu, boolean greater) {
+	public void exactSearch(String metr, String cont, String popu, boolean greater) {
 		String query = buildExactString(metr, cont, popu, greater);
-		System.out.println(query);
+		
+		try {
+			Statement stmt;
+			stmt = con.createStatement();
+			stmt.executeQuery("USE " + database);
+			rs = stmt.executeQuery(query);
+			this.fireTableDataChanged();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 	}
 	
-		public String buildExactString(String metr, String cont, Long popu, boolean greater) {
-			boolean first = true;
-			String qString = "SELECT * FROM " + dbase_name + " ";
+		public String buildExactString(String metr, String cont, String popu, boolean greater) {
+			String qString = "SELECT * FROM " + dbase_name + " WHERE ";
+			
+			ArrayList<String> queries = new ArrayList<String>();
 			if (!metr.equals("")) {
-				first = false;
-				qString += "WHERE metropolis = \"" + metr + "\"";
+				String str = "metropolis = \"" + metr + "\" ";
+				queries.add(str);
 			}
 			
 			if (!cont.equals("")) {
-				if (first) {
-					first = false;
-					qString += " WHERE continent = \"" + cont + "\"";
-				}else  {
-					qString += " AND WHERE continent = \"" + cont + "\"";
-				}
+				String str = " continent = \"" + cont + "\" ";
+				queries.add(str);
 			}
 			
-			if (popu != null) {
-				if (first) {
-					first = false;
-					qString += " WHERE population = \"" + popu + "\"";
-				}else  {
-					qString += " AND WHERE continent = \"" + popu + "\"";
+			if (!popu.equals("")) {
+				String str = "population ";
+				if (greater) {
+					str += "> ";
+				}else {
+					str += "< " + popu + " OR " + "population = ";
 				}
+				str += popu;
+				queries.add(str);
+			}
+			
+			boolean first = true;
+			for (int i = 0; i < queries.size(); i++) {
+				if (!first) qString += " AND ";
+				qString += queries.get(i);
+				first = false;
 			}
 			
 			qString += ";";
@@ -189,6 +207,29 @@ public class MetropolisTableModel extends AbstractTableModel {
 	static String server = MyDBInfo.MYSQL_DATABASE_SERVER;
 	static String database = MyDBInfo.MYSQL_DATABASE_NAME;
 	static String dbase_name = "metropolises";
+	
+//	if (!metr.equals("")) {
+//		first = false;
+//		qString += "WHERE metropolis = \"" + metr + "\"";
+//	}
+//	
+//	if (!cont.equals("")) {
+//		if (first) {
+//			first = false;
+//			qString += " WHERE continent = \"" + cont + "\"";
+//		}else  {
+//			qString += " AND WHERE continent = \"" + cont + "\"";
+//		}
+//	}
+//	
+//	if (popu != null) {
+//		if (first) {
+//			first = false;
+//			qString += " WHERE population = \"" + popu + "\"";
+//		}else  {
+//			qString += " AND WHERE continent = \"" + popu + "\"";
+//		}
+//	}
 	
 	
 }
